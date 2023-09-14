@@ -1,11 +1,12 @@
 from aiohttp import ClientSession, TCPConnector
 from blacksheep.server.responses import json
+from blacksheep.server.responses import text
 from blacksheep.server import Application
 from google.cloud import secretmanager
 import google_crc32c
 import asyncio
+import base64
 import openai
-import os
 
 def access_secret_version(
     secret_id: str, version_id: str
@@ -58,7 +59,7 @@ async def query(user_query):
             {"role": "user", "content": user_query}
         ],
         temperature=0.7,
-        max_tokens=800,
+        max_tokens=8000,
         top_p=0.95,
         frequency_penalty=0,
         presence_penalty=0,
@@ -75,13 +76,9 @@ async def main(user_query):
 
 app = Application()
 
-
-import base64
-from blacksheep.server.responses import text
-
 # Expected credentials (hardcoded for demonstration purposes)
-EXPECTED_USERNAME = access_secret_version("uid", "1")
-EXPECTED_PASSWORD = access_secret_version("passwd", "1")
+uid = access_secret_version("uid", "1")
+code = access_secret_version("passwd", "1")
 
 async def basic_auth_middleware(request, handler):
     
@@ -99,7 +96,7 @@ async def basic_auth_middleware(request, handler):
     decoded_auth_string = base64.b64decode(auth_string).decode('utf-8')
     username, _, password = decoded_auth_string.partition(':')
     
-    if username != EXPECTED_USERNAME or password != EXPECTED_PASSWORD:
+    if username != uid or password != code:
         return text("Unauthorized", status=401)
     
     return await handler(request)
@@ -122,4 +119,4 @@ async def health():
     return json({"status": "healthy"})
 
 if __name__ == "__main__":
-    asyncio.run(app.start())
+    asyncio.run(app.start(port=8080))
