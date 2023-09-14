@@ -17,4 +17,4 @@ COPY main.py .
 EXPOSE 8080
 
 # Command to run the script
-CMD ["python", "main.py"]
+CMD ["uvicorn", "main:app"]

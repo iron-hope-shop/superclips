@@ -117,5 +117,9 @@ async def echo(request):
     response = await main(user_query)
     return json({"response": response})
 
+@app.route("/")
+async def health():
+    return json({"status": "healthy"})
+
 if __name__ == "__main__":
     asyncio.run(app.start())
