@@ -1,0 +1,5 @@
+google-cloud-secret-manager
+google_crc32c
+blacksheep
+uvicorn
+openai
