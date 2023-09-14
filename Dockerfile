@@ -4,6 +4,13 @@ FROM python:3.11-slim
 # Set the working directory in the container
 WORKDIR /app
 
+# Install build tools
+RUN apt-get update && apt-get install -y \
+    gcc \
+    build-essential \
+    libffi-dev \
+    libssl-dev
+
 # Copy the requirements for the Python application
 COPY requirements.txt .
 
