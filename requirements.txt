@@ -1,5 +1,5 @@
 google-cloud-secret-manager
-google_crc32c
-blacksheep
-uvicorn
+google-crc32c
+discord.py
 openai
+Flask==2.0.1

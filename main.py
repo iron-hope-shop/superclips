@@ -1,12 +1,9 @@
-from aiohttp import ClientSession, TCPConnector
-from blacksheep.server.responses import json
-from blacksheep.server.responses import text
-from blacksheep.server import Application
 from google.cloud import secretmanager
+from flask import Flask, jsonify
 import google_crc32c
-import asyncio
-import base64
 import openai
+import os
+
 
 def access_secret_version(
     secret_id: str, version_id: str
@@ -46,64 +43,49 @@ def setup_openai_api():
     openai.api_version = access_secret_version("API_VERSION", "1")
     openai.api_key = access_secret_version("API_KEY", "1")
 
-    # Set up aiohttp session with an option to bypass SSL verification (for development purposes only!)
-    connector = TCPConnector(ssl=False)
-    openai.aiosession.set(ClientSession(connector=connector))
-
-async def query(user_query):
+def query(user_query, channel_history):
     system_instruction = f"You are a Software Engineer. Your job is to write effective code in a pair programming environment with your teammate, Brad."
+    # Starting with the system instruction
+    messages = [{"role": "system", "content": system_instruction}]
+    
+    # Convert and add the previous interactions from the history
+    for interaction in channel_history:
+        messages.append({"role": "user", "content": interaction["prompt"]})
+        messages.append({"role": "assistant", "content": interaction["response"]})
+
+    # Add the current user query
+    messages.append({"role": "user", "content": user_query})
+
+    # Limit to the last 10 interactions (or whatever limit you prefer)
+    messages = messages[-10:]
+    print(messages)
+
     # Asynchronous API call
-    chat_completion_resp = await openai.ChatCompletion.acreate(
+    chat_completion_resp = openai.ChatCompletion.create(
         engine=access_secret_version("ENGINE", "1"),
-        prompt=[
-            {"role": "system", "content": system_instruction},
-            {"role": "user", "content": user_query}
-        ],
-        temperature=1,
-        max_tokens=100,
-        top_p=0.5,
+        messages=messages,
+        temperature=0.7,
+        max_tokens=800,
+        top_p=0.95,
         frequency_penalty=0,
         presence_penalty=0,
-        best_of=1,
         stop=None
     )
     return chat_completion_resp.choices[0].message.content
 
+app = Flask(__name__)
 
-async def main(user_query):
+@app.route('/')
+def home():
+    return jsonify({"status": "Bot is running!"}), 200
+
+
+history = {}  # Store history for each channel
+
+if __name__ == "__main__":
     setup_openai_api()
-    response = await query(user_query)
-    await openai.aiosession.get().close()
-    return response
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
 
-app = Application()
-
-c1_un = access_secret_version("C1_UN", "1")
-c2_pw = access_secret_version("C2_PW", "1")
-
-async def basic_auth_middleware(request, handler):
-    
-    auth_header_value = request.headers.get(b'authorization')
-    auth_header = auth_header_value[0] if isinstance(auth_header_value, tuple) else auth_header_value
-    
-    
-    if not auth_header:
-        return text("Unauthorized", status=401)
-    
-    auth_type, _, auth_string = auth_header.partition(b' ')
-    if auth_type.lower() != b'basic':
-        return text("Unauthorized", status=401)
-    
-    decoded_auth_string = base64.b64decode(auth_string).decode('utf-8')
-    un, _, pw = decoded_auth_string.partition(':')
-    
-    if un != c1_un or pw != c2_pw:
-        return text("Unauthorized", status=401)
-    
-    return await handler(request)
-
-
-# app.middlewares.append(basic_auth_middleware)
 
 # @app.router.post("/echo")
 # async def echo(request):
@@ -112,12 +94,5 @@ async def basic_auth_middleware(request, handler):
 #     if not user_query:
 #         return json({"error": "Query not provided."}, status=400)
     
-#     response = await main(user_query)
-#     return json({"response": response})
-
-@app.route("/")
-async def health():
-    return json({"status": "healthy"})
-
-if __name__ == "__main__":
-    asyncio.run(app.start(port=8080))
+# c1_un = access_secret_version("C1_UN", "1")
+# c2_pw = access_secret_version("C2_PW", "1")
