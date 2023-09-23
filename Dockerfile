@@ -4,13 +4,6 @@ FROM python:3.11-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Install build tools
-RUN apt-get update && apt-get install -y \
-    gcc \
-    build-essential \
-    libffi-dev \
-    libssl-dev
-
 # Copy the requirements for the Python application
 COPY requirements.txt .
 
@@ -22,6 +15,9 @@ COPY main.py .
 
 # Specify the port number the container should expose (if needed)
 EXPOSE 8080
+
+# # Command to run the script
+# CMD ["python", "main.py"]
 
 # Command to run the script
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

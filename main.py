@@ -103,17 +103,17 @@ async def basic_auth_middleware(request, handler):
     return await handler(request)
 
 
-app.middlewares.append(basic_auth_middleware)
+# app.middlewares.append(basic_auth_middleware)
 
-@app.router.post("/echo")
-async def echo(request):
-    data = await request.json()
-    user_query = data.get("query")
-    if not user_query:
-        return json({"error": "Query not provided."}, status=400)
+# @app.router.post("/echo")
+# async def echo(request):
+#     data = await request.json()
+#     user_query = data.get("query")
+#     if not user_query:
+#         return json({"error": "Query not provided."}, status=400)
     
-    response = await main(user_query)
-    return json({"response": response})
+#     response = await main(user_query)
+#     return json({"response": response})
 
 @app.route("/")
 async def health():
