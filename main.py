@@ -37,41 +37,41 @@ def access_secret_version(
     return payload
 
 # Set up OpenAI API configurations
-def setup_openai_api():
-    openai.api_type = access_secret_version("API_TYPE", "1")
-    openai.api_base = access_secret_version("API_BASE", "1")
-    openai.api_version = access_secret_version("API_VERSION", "1")
-    openai.api_key = access_secret_version("API_KEY", "1")
+# def setup_openai_api():
+#     openai.api_type = access_secret_version("API_TYPE", "1")
+#     openai.api_base = access_secret_version("API_BASE", "1")
+#     openai.api_version = access_secret_version("API_VERSION", "1")
+#     openai.api_key = access_secret_version("API_KEY", "1")
 
-def query(user_query, channel_history):
-    system_instruction = f"You are a Software Engineer. Your job is to write effective code in a pair programming environment with your teammate, Brad."
-    # Starting with the system instruction
-    messages = [{"role": "system", "content": system_instruction}]
+# def query(user_query, channel_history):
+#     system_instruction = f"You are a Software Engineer. Your job is to write effective code in a pair programming environment with your teammate, Brad."
+#     # Starting with the system instruction
+#     messages = [{"role": "system", "content": system_instruction}]
     
-    # Convert and add the previous interactions from the history
-    for interaction in channel_history:
-        messages.append({"role": "user", "content": interaction["prompt"]})
-        messages.append({"role": "assistant", "content": interaction["response"]})
+#     # Convert and add the previous interactions from the history
+#     for interaction in channel_history:
+#         messages.append({"role": "user", "content": interaction["prompt"]})
+#         messages.append({"role": "assistant", "content": interaction["response"]})
 
-    # Add the current user query
-    messages.append({"role": "user", "content": user_query})
+#     # Add the current user query
+#     messages.append({"role": "user", "content": user_query})
 
-    # Limit to the last 10 interactions (or whatever limit you prefer)
-    messages = messages[-10:]
-    print(messages)
+#     # Limit to the last 10 interactions (or whatever limit you prefer)
+#     messages = messages[-10:]
+#     print(messages)
 
-    # Asynchronous API call
-    chat_completion_resp = openai.ChatCompletion.create(
-        engine=access_secret_version("ENGINE", "1"),
-        messages=messages,
-        temperature=0.7,
-        max_tokens=800,
-        top_p=0.95,
-        frequency_penalty=0,
-        presence_penalty=0,
-        stop=None
-    )
-    return chat_completion_resp.choices[0].message.content
+#     # Asynchronous API call
+#     chat_completion_resp = openai.ChatCompletion.create(
+#         engine=access_secret_version("ENGINE", "1"),
+#         messages=messages,
+#         temperature=0.7,
+#         max_tokens=800,
+#         top_p=0.95,
+#         frequency_penalty=0,
+#         presence_penalty=0,
+#         stop=None
+#     )
+#     return chat_completion_resp.choices[0].message.content
 
 app = Flask(__name__)
 
@@ -83,7 +83,7 @@ def home():
 history = {}  # Store history for each channel
 
 if __name__ == "__main__":
-    setup_openai_api()
+    # setup_openai_api()
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
 
 
