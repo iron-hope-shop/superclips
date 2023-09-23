@@ -23,7 +23,7 @@ def access_secret_version(
     client = secretmanager.SecretManagerServiceClient()
 
     # Build the resource name of the secret version.
-    name = f"projects/superclips/secrets/{secret_id}/versions/{version_id}"
+    name = f"projects/website/secrets/{secret_id}/versions/{version_id}"
 
     # Access the secret version.
     response = client.access_secret_version(request={"name": name})
@@ -41,10 +41,11 @@ def access_secret_version(
 
 # Set up OpenAI API configurations
 def setup_openai_api():
-    openai.api_type = "azure"
-    openai.api_base = access_secret_version("api_base", "1")
-    openai.api_version = "2023-07-01-preview"
-    openai.api_key = access_secret_version("OPENAI_API_KEY", "1")
+    openai.api_type = access_secret_version("API_TYPE", "1")
+    openai.api_base = access_secret_version("API_BASE", "1")
+    openai.api_version = access_secret_version("API_VERSION", "1")
+    openai.api_key = access_secret_version("API_KEY", "1")
+
     # Set up aiohttp session with an option to bypass SSL verification (for development purposes only!)
     connector = TCPConnector(ssl=False)
     openai.aiosession.set(ClientSession(connector=connector))
@@ -53,16 +54,17 @@ async def query(user_query):
     system_instruction = f"You are a Software Engineer. Your job is to write effective code in a pair programming environment with your teammate, Brad."
     # Asynchronous API call
     chat_completion_resp = await openai.ChatCompletion.acreate(
-        engine="EchoChamber",
-        messages=[
+        engine=access_secret_version("ENGINE", "1"),
+        prompt=[
             {"role": "system", "content": system_instruction},
             {"role": "user", "content": user_query}
         ],
-        temperature=0.7,
-        max_tokens=8000,
-        top_p=0.95,
+        temperature=1,
+        max_tokens=100,
+        top_p=0.5,
         frequency_penalty=0,
         presence_penalty=0,
+        best_of=1,
         stop=None
     )
     return chat_completion_resp.choices[0].message.content
@@ -76,9 +78,8 @@ async def main(user_query):
 
 app = Application()
 
-# Expected credentials (hardcoded for demonstration purposes)
-uid = access_secret_version("uid", "1")
-code = access_secret_version("passwd", "1")
+c1_un = access_secret_version("C1_UN", "1")
+c2_pw = access_secret_version("C2_PW", "1")
 
 async def basic_auth_middleware(request, handler):
     
@@ -94,9 +95,9 @@ async def basic_auth_middleware(request, handler):
         return text("Unauthorized", status=401)
     
     decoded_auth_string = base64.b64decode(auth_string).decode('utf-8')
-    username, _, password = decoded_auth_string.partition(':')
+    un, _, pw = decoded_auth_string.partition(':')
     
-    if username != uid or password != code:
+    if un != c1_un or pw != c2_pw:
         return text("Unauthorized", status=401)
     
     return await handler(request)
