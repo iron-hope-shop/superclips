@@ -97,3 +97,4 @@ if __name__ == "__main__":
     
 # c1_un = access_secret_version("C1_UN", "1")
 # c2_pw = access_secret_version("C2_PW", "1")
+
