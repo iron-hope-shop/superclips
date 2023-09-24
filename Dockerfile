@@ -11,11 +11,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the main Python script
-COPY app.py .
+COPY main.py .
 
 # Specify the port number the container should expose (if needed)
 EXPOSE 8080
 
 # Command to run the script
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]
 
