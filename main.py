@@ -75,7 +75,7 @@ def access_secret_version(
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/health')
 def home():
     return jsonify({"status": "Bot is running!"}), 200
 
