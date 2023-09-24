@@ -84,6 +84,7 @@ history = {}  # Store history for each channel
 
 if __name__ == "__main__":
     # setup_openai_api()
+    print("WTF WTF WTF WTF WTF WTF WTF WTF WTF WTF WTF WTF WTF WTF WTF WTF WTF WTF WTF WTF")
     app.run(host='0.0.0.0', port=8080)
 
 
