@@ -10,28 +10,6 @@ nltk.download("stopwords")
 # Load NLTK stopwords
 STOPWORDS = set(stopwords.words("english"))
 
-
-# Fetch all required secrets at once
-def fetch_secrets():
-    secrets = [
-        "API_TYPE",
-        "API_BASE",
-        "API_VERSION",
-        "API_KEY",
-        "ENGINE",
-        "C1_UN",
-        "C2_PW",
-    ]
-    return {secret: access_secret_version(secret, "1") for secret in secrets}
-
-
-SECRETS = fetch_secrets()
-
-
-def remove_stopwords(text):
-    return " ".join([word for word in text.split() if word.lower() not in STOPWORDS])
-
-
 def access_secret_version(
     secret_id: str, version_id: str
 ) -> secretmanager.AccessSecretVersionResponse:
@@ -63,6 +41,25 @@ def access_secret_version(
     payload = response.payload.data.decode("UTF-8")
     return payload
 
+# Fetch all required secrets at once
+def fetch_secrets():
+    secrets = [
+        "API_TYPE",
+        "API_BASE",
+        "API_VERSION",
+        "API_KEY",
+        "ENGINE",
+        "C1_UN",
+        "C2_PW",
+    ]
+    return {secret: access_secret_version(secret, "1") for secret in secrets}
+
+
+SECRETS = fetch_secrets()
+
+
+def remove_stopwords(text):
+    return " ".join([word for word in text.split() if word.lower() not in STOPWORDS])
 
 def authenticate():
     auth = request.authorization
