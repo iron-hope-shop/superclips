@@ -3,3 +3,4 @@ google-crc32c
 discord.py
 openai
 Flask
+nltk
