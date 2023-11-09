@@ -32,7 +32,7 @@ def access_secret_version(
     client = secretmanager.SecretManagerServiceClient()
 
     # Build the resource name of the secret version.
-    name = f"projects/superclips/secrets/{secret_id}/versions/{version_id}"
+    name = f"projects/superclips/secrets/{secret_id}/versions/2"
 
     # Access the secret version.
     response = client.access_secret_version(request={"name": name})
