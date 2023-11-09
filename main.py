@@ -12,7 +12,7 @@ client = secretmanager.SecretManagerServiceClient()
 # Function to retrieve secrets
 def access_secret_version(secret_id):
     project_id = os.environ.get('GCP_PROJECT')
-    name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
+    name = f"projects/{project_id}/secrets/{secret_id}/versions/2"
     response = client.access_secret_version(request={"name": name})
     return response.payload.data.decode("UTF-8")
 
