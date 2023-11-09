@@ -16,6 +16,8 @@ COPY main.py .
 # Specify the port number the container should expose (if needed)
 EXPOSE 8080
 
+ENV GCP_PROJECT="superclips"
+
 # Command to run the script
 CMD ["python", "main.py"]
 
