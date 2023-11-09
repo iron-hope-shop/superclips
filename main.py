@@ -18,7 +18,7 @@ client = secretmanager.SecretManagerServiceClient()
 #     return response.payload.data.decode("UTF-8")
 
 def access_secret_version(
-    secret_id: str, version_id: str = "2"
+    secret_id: str
 ) -> secretmanager.AccessSecretVersionResponse:
     """
     Access the payload for the given secret version if one exists. The version
@@ -32,7 +32,7 @@ def access_secret_version(
     client = secretmanager.SecretManagerServiceClient()
 
     # Build the resource name of the secret version.
-    name = f"projects/superclips/secrets/{secret_id}/versions/{version_id}"
+    name = f"projects/superclips/secrets/{secret_id}/versions/2"
 
     # Access the secret version.
     response = client.access_secret_version(request={"name": name})
